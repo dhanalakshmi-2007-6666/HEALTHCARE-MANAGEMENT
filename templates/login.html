@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMS Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="page-shell">
+        <section class="auth-card">
+            <div class="brand-block">
+                <span class="brand-badge">HMS Portal</span>
+                <h1>Welcome back</h1>
+                <p>Sign in to continue to your hospital management dashboard.</p>
+            </div>
+
+            <div class="role-preview">
+                <div class="role-chip receptionist {% if selected_role == 'Admin' %}active{% endif %}">Admin</div>
+                <div class="role-chip doctor {% if selected_role == 'Doctor' %}active{% endif %}">Doctor</div>
+                <div class="role-chip patient {% if selected_role == 'Nurse' %}active{% endif %}">Nurse</div>
+                <div class="role-chip doctor {% if selected_role == 'Pharmacist' %}active{% endif %}">Pharmacist</div>
+                <div class="role-chip patient {% if selected_role == 'Patient' %}active{% endif %}">Patient</div>
+                <div class="role-chip receptionist {% if selected_role == 'Receptionist' %}active{% endif %}">Receptionist</div>
+            </div>
+
+            {% if message %}
+            <div class="alert {{ message_type }}">{{ message }}</div>
+            {% endif %}
+
+            <form method="post" class="login-form">
+                <label for="role">Login as</label>
+                <div class="select-wrap">
+                    <select id="role" name="role" aria-label="Select role">
+                        <option value="Admin" {% if selected_role == 'Admin' %}selected{% endif %}>Admin</option>
+                        <option value="Doctor" {% if selected_role == 'Doctor' %}selected{% endif %}>Doctor</option>
+                        <option value="Nurse" {% if selected_role == 'Nurse' %}selected{% endif %}>Nurse</option>
+                        <option value="Pharmacist" {% if selected_role == 'Pharmacist' %}selected{% endif %}>Pharmacist</option>
+                        <option value="Patient" {% if selected_role == 'Patient' %}selected{% endif %}>Patient</option>
+                        <option value="Receptionist" {% if selected_role == 'Receptionist' %}selected{% endif %}>Receptionist</option>
+                    </select>
+                </div>
+
+                <label for="username">Username or Email</label>
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Enter your username or email"
+                    autocomplete="username"
+                    required
+                >
+
+                <label for="password">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    required
+                >
+
+                <div class="form-row">
+                    <label class="remember-me">
+                        <input type="checkbox" name="remember">
+                        <span>Remember me</span>
+                    </label>
+                    <a href="{{ url_for('register') }}" class="link-button">Create account</a>
+                </div>
+
+                <button type="submit">Sign In</button>
+            </form>
+
+            <div class="support-text">
+                New to the portal? <a href="{{ url_for('register') }}">Create an account</a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

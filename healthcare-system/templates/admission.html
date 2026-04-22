@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Admissions{% endblock %}
+{% block content %}
+<h2>Admission and Bed Management</h2>
+<div class="row g-3">
+    <div class="col-lg-5">
+        <div class="card"><div class="card-body">
+            <h5>Admit Patient</h5>
+            <form method="POST" action="{{ url_for('admin.admissions') }}" class="row g-2">
+                <div class="col-12">
+                    <select class="form-select" name="patient_id">{% for p in patients %}<option value="{{ p.id }}">{{ p.full_name }} ({{ p.patient_code }})</option>{% endfor %}</select>
+                </div>
+                <div class="col-12">
+                    <select class="form-select" name="doctor_id">{% for d in doctors %}<option value="{{ d.id }}">{{ d.full_name }}</option>{% endfor %}</select>
+                </div>
+                <div class="col-12">
+                    <select class="form-select" name="bed_id">{% for b in beds %}<option value="{{ b.id }}">{{ b.bed_number }} | {{ b.ward }} | {% if b.is_occupied %}Occupied{% else %}Available{% endif %}</option>{% endfor %}</select>
+                </div>
+                <div class="col-12"><button class="btn btn-primary w-100">Admit</button></div>
+            </form>
+        </div></div>
+    </div>
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead><tr><th>Patient</th><th>Bed</th><th>Status</th><th>Billing</th><th>Actions</th></tr></thead>
+                    <tbody>
+                    {% for a in admissions %}
+                    <tr>
+                        <td>{{ a.patient_id }}</td>
+                        <td>{{ a.bed_id }}</td>
+                        <td>{{ a.status }}</td>
+                        <td>{{ a.total_billing }}</td>
+                        <td>
+                            {% if a.status != "DISCHARGED" %}
+                            <form method="POST" action="{{ url_for('admin.discharge', admission_id=a.id) }}" class="mb-1">
+                                <input class="form-control form-control-sm mb-1" name="discharge_summary" placeholder="Discharge summary" required>
+                                <button class="btn btn-sm btn-outline-danger">Discharge</button>
+                            </form>
+                            <form method="POST" action="{{ url_for('admin.transfer_bed', admission_id=a.id) }}" class="d-flex gap-1">
+                                <select class="form-select form-select-sm" name="new_bed_id">{% for b in beds %}<option value="{{ b.id }}">{{ b.bed_number }}</option>{% endfor %}</select>
+                                <button class="btn btn-sm btn-outline-secondary">Transfer</button>
+                            </form>
+                            {% else %}
+                            Completed
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-center py-3 text-muted">No admissions.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

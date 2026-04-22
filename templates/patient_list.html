@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient List</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <main class="dashboard-shell">
+        <section class="dashboard-card receptionist-theme">
+            <div class="dashboard-topbar">
+                <div>
+                    <span class="brand-badge">Patient Registry</span>
+                    <h1>Patient List</h1>
+                    <p>Search by patient ID or name to quickly access records.</p>
+                </div>
+                <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
+            </div>
+
+            <form method="get" class="login-form" style="margin-bottom: 20px;">
+                <label for="q">Search Patient</label>
+                <input id="q" name="q" value="{{ query }}" placeholder="PAT2026001 or patient name">
+                <button type="submit">Search</button>
+            </form>
+
+            <div class="form-row" style="margin-bottom: 16px;">
+                <a class="link-button" href="{{ url_for('patient.add_patient') }}">Add patient</a>
+                <a class="link-button" href="{{ url_for('dashboard.receptionist_dashboard') }}">Back to dashboard</a>
+            </div>
+
+            <div class="info-card">
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">Patient ID
+                                </th>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">Name</th>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">Age</th>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">Gender
+                                </th>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">Phone</th>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">Created
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for patient in patients %}
+                            <tr>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{ patient.patient_id }}
+                                </td>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{ patient.name }}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{ patient.age }}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{ patient.gender }}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{ patient.phone }}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{ patient.created_at }}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" style="padding: 14px; color: #64748b;">No patients found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <main class="dashboard-shell">
+        <section class="dashboard-card doctor-theme">
+            <div class="dashboard-topbar">
+                <div>
+                    <span class="brand-badge">Pharmacy</span>
+                    <h1>Pharmacy Management</h1>
+                    <p>Manage inventory, prescriptions, and low-stock alerts.</p>
+                </div>
+                <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
+            </div>
+
+            {% if message %}
+            <div class="alert {{ message_type }}">{{ message }}</div>
+            {% endif %}
+
+            <div class="info-card" style="margin-bottom: 20px;">
+                <h3>Low Stock Alerts</h3>
+                {% if low_stock_medicines %}
+                <ul style="margin: 0; padding-left: 20px; color: #334155;">
+                    {% for med in low_stock_medicines %}
+                    <li>{{ med.medicine_name }} - Stock: {{ med.stock_qty }} (Threshold: {{ med.low_stock_threshold }})
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p style="margin: 0; color: #64748b;">No low stock medicines right now.</p>
+                {% endif %}
+            </div>
+
+            {% if session['role'] in ['Admin', 'Pharmacist'] %}
+            <div class="info-card" style="margin-bottom: 20px;">
+                <h3>Add / Update Medicine</h3>
+                <form method="post" class="login-form">
+                    <input type="hidden" name="action" value="save_medicine">
+                    <label for="medicine_name">Medicine Name</label>
+                    <input id="medicine_name" name="medicine_name" placeholder="Paracetamol" required>
+
+                    <div class="form-row">
+                        <div style="flex: 1;">
+                            <label for="stock_qty">Stock Quantity</label>
+                            <input id="stock_qty" type="number" min="0" name="stock_qty" required>
+                        </div>
+                        <div style="flex: 1;">
+                            <label for="unit_price">Unit Price</label>
+                            <input id="unit_price" type="number" min="0" step="0.01" name="unit_price" required>
+                        </div>
+                    </div>
+
+                    <label for="low_stock_threshold">Low Stock Threshold</label>
+                    <input id="low_stock_threshold" type="number" min="0" name="low_stock_threshold" value="10"
+                        required>
+                    <button type="submit">Save Medicine</button>
+                </form>
+            </div>
+            {% endif %}
+
+            {% if session['role'] in ['Admin', 'Doctor'] %}
+            <div class="info-card" style="margin-bottom: 20px;">
+                <h3>Create Prescription</h3>
+                <form method="post" class="login-form">
+                    <input type="hidden" name="action" value="add_prescription">
+                    <label for="patient_id">Patient ID</label>
+                    <input id="patient_id" name="patient_id" placeholder="PAT2026001" required>
+
+                    <label for="prescription_medicine_name">Medicine Name</label>
+                    <input id="prescription_medicine_name" name="medicine_name" placeholder="Paracetamol" required>
+
+                    <label for="quantity">Quantity</label>
+                    <input id="quantity" type="number" min="1" name="quantity" required>
+
+                    <label for="notes">Prescription Notes</label>
+                    <input id="notes" name="notes" placeholder="Take twice daily after food" required>
+
+                    <button type="submit">Create Prescription</button>
+                </form>
+            </div>
+            {% endif %}
+
+            <form method="get" class="login-form" style="margin-bottom: 16px;">
+                <label for="q">Search by medicine or patient</label>
+                <input id="q" name="q" value="{{ query }}" placeholder="Search">
+                <button type="submit">Search</button>
+            </form>
+
+            <div class="info-card" style="margin-bottom: 20px;">
+                <h3>Medicine Inventory</h3>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">Medicine
+                                </th>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">Stock</th>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">Unit Price
+                                </th>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">Threshold
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for med in medicines %}
+                            <tr>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{ med.medicine_name }}
+                                </td>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{ med.stock_qty }}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{ med.unit_price }}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{ med.low_stock_threshold
+                                    }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" style="padding: 14px; color: #64748b;">No medicines available.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3>Prescriptions</h3>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">ID</th>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">Patient
+                                </th>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">Doctor
+                                </th>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">Medicine
+                                </th>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">Qty</th>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">Status
+                                </th>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in prescriptions %}
+                            <tr>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{ item.id }}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{ item.patient_id }}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{ item.doctor_username }}
+                                </td>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{ item.medicine_name }}
+                                </td>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{ item.quantity }}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{ item.status }}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">
+                                    {% if item.status != 'COMPLETED' and session['role'] in ['Admin', 'Pharmacist'] %}
+                                    <form method="post">
+                                        <input type="hidden" name="action" value="complete_prescription">
+                                        <input type="hidden" name="prescription_id" value="{{ item.id }}">
+                                        <button type="submit">Mark Completed</button>
+                                    </form>
+                                    {% else %}
+                                    <span class="text-muted">{{ item.completed_by or 'View only' }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="7" style="padding: 14px; color: #64748b;">No prescriptions found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="support-text" style="text-align:left; margin-top: 16px;">
+                <a
+                    href="{{ url_for('dashboard.admin_dashboard') if session['role'] == 'Admin' else (url_for('dashboard.doctor_dashboard') if session['role'] == 'Doctor' else url_for('dashboard.pharmacist_dashboard')) }}">Back
+                    to dashboard</a>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>

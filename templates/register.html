@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="page-shell">
+        <section class="auth-card auth-card-wide">
+            <div class="brand-block">
+                <span class="brand-badge">HMS Registration</span>
+                <h1>Create your account</h1>
+                <p>Register once, then log in to the correct hospital portal based on your role.</p>
+            </div>
+
+            {% if message %}
+            <div class="alert {{ message_type }}">{{ message }}</div>
+            {% endif %}
+
+            <form method="post" class="login-form">
+                <label for="full_name">Full Name</label>
+                <input
+                    type="text"
+                    id="full_name"
+                    name="full_name"
+                    placeholder="Enter your full name"
+                    required
+                >
+
+                <label for="role">Account Role</label>
+                <div class="select-wrap">
+                    <select id="role" name="role" aria-label="Select role">
+                        <option value="Admin" {% if selected_role == 'Admin' %}selected{% endif %}>Admin</option>
+                        <option value="Doctor" {% if selected_role == 'Doctor' %}selected{% endif %}>Doctor</option>
+                        <option value="Nurse" {% if selected_role == 'Nurse' %}selected{% endif %}>Nurse</option>
+                        <option value="Pharmacist" {% if selected_role == 'Pharmacist' %}selected{% endif %}>Pharmacist</option>
+                        <option value="Patient" {% if selected_role == 'Patient' %}selected{% endif %}>Patient</option>
+                        <option value="Receptionist" {% if selected_role == 'Receptionist' %}selected{% endif %}>Receptionist</option>
+                    </select>
+                </div>
+
+                <label for="username">Username</label>
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Choose a username"
+                    autocomplete="username"
+                    required
+                >
+
+                <label for="password">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Create a password"
+                    autocomplete="new-password"
+                    required
+                >
+
+                <label for="confirm_password">Confirm Password</label>
+                <input
+                    type="password"
+                    id="confirm_password"
+                    name="confirm_password"
+                    placeholder="Confirm your password"
+                    autocomplete="new-password"
+                    required
+                >
+
+                <button type="submit">Create Account</button>
+            </form>
+
+            <div class="support-text">
+                Already have an account? <a href="{{ url_for('login') }}">Go to login</a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

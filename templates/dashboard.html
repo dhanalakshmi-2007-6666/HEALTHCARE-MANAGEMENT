@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMS | {{ dashboard_title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon"><i class="fa-solid fa-hospital"></i></div>
+                <h2>HMS Pro</h2>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard.root_dashboard') }}" class="nav-item active">
+                    <i class="fa-solid fa-chart-pie"></i> <span>Dashboard</span>
+                </a>
+                
+                {% if session['role'] in ['Admin', 'Doctor', 'Receptionist', 'Nurse'] %}
+                <a href="{{ url_for('patient.patient_list') }}" class="nav-item">
+                    <i class="fa-solid fa-users"></i> <span>Patients</span>
+                </a>
+                <a href="{{ url_for('appointment.appointments_page') }}" class="nav-item">
+                    <i class="fa-solid fa-calendar-check"></i> <span>Appointments</span>
+                </a>
+                {% endif %}
+                
+                {% if session['role'] in ['Admin', 'Doctor', 'Nurse'] %}
+                <a href="{{ url_for('medical.medical_records_page') }}" class="nav-item">
+                    <i class="fa-solid fa-notes-medical"></i> <span>Medical Records</span>
+                </a>
+                {% endif %}
+
+                {% if session['role'] in ['Admin', 'Pharmacist', 'Doctor'] %}
+                <a href="{{ url_for('pharmacy.pharmacy_page') }}" class="nav-item">
+                    <i class="fa-solid fa-pills"></i> <span>Pharmacy</span>
+                </a>
+                {% endif %}
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="{{ url_for('logout') }}" class="nav-item logout">
+                    <i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <h1>{{ dashboard_title }}</h1>
+                    <p class="text-subtitle">{{ dashboard_description }}</p>
+                </div>
+                <div class="topbar-right">
+                    <div class="user-profile">
+                        <div class="avatar"><i class="fa-regular fa-circle-user" style="font-size: 2rem;"></i></div>
+                        <div class="user-info">
+                            <span class="user-name">{{ session['full_name'] }}</span>
+                            <span class="user-role badge-role">{{ session['role'] }}</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-body">
+                <!-- Data Stat Cards -->
+                <div class="stats-grid">
+                    
+                    {% if session['role'] in ['Admin', 'Receptionist', 'Doctor'] %}
+                    <div class="stat-card" style="--card-color: #3b82f6;">
+                        <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                        <div class="stat-info">
+                            <h3>Total Patients</h3>
+                            <p class="stat-value" id="val-total-patients">{{ stats.total_patients }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if session['role'] == 'Admin' %}
+                    <div class="stat-card" style="--card-color: #8b5cf6;">
+                        <div class="stat-icon"><i class="fa-solid fa-user-doctor"></i></div>
+                        <div class="stat-info">
+                            <h3>Total Doctors</h3>
+                            <p class="stat-value" id="val-total-doctors">{{ stats.total_doctors }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if session['role'] in ['Admin', 'Receptionist', 'Patient'] %}
+                    <div class="stat-card" style="--card-color: #10b981;">
+                        <div class="stat-icon"><i class="fa-solid fa-calendar-day"></i></div>
+                        <div class="stat-info">
+                            <h3>Hospital Appointments</h3>
+                            <p class="stat-value" id="val-today-appts">{{ stats.today_appointments_all }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if session['role'] == 'Doctor' %}
+                    <div class="stat-card" style="--card-color: #10b981;">
+                        <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                        <div class="stat-info">
+                            <h3>My Appointments</h3>
+                            <p class="stat-value" id="val-today-appts-doc">{{ stats.today_appointments_doctor }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if session['role'] in ['Admin', 'Pharmacist', 'Doctor'] %}
+                    <div class="stat-card" style="--card-color: #ef4444;">
+                        <div class="stat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="stat-info">
+                            <h3>Low Stock Alerts</h3>
+                            <p class="stat-value" id="val-low-stock">{{ stats.low_stock_medicines }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if session['role'] in ['Admin'] %}
+                    <div class="stat-card" style="--card-color: #f59e0b;">
+                        <div class="stat-icon"><i class="fa-solid fa-bed-pulse"></i></div>
+                        <div class="stat-info">
+                            <h3>Available Beds</h3>
+                            <p class="stat-value" id="val-beds">{{ stats.available_beds }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if session['role'] in ['Pharmacist'] %}
+                    <div class="stat-card" style="--card-color: #0ea5e9;">
+                        <div class="stat-icon"><i class="fa-solid fa-prescription-bottle-medical"></i></div>
+                        <div class="stat-info">
+                            <h3>Pending Prescriptions</h3>
+                            <p class="stat-value" id="val-pending-rx">{{ stats.pending_prescriptions }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                </div>
+
+                <!-- Detail Tables Area -->
+                <div class="tables-grid">
+                    {% if 'recent_appointments' in tables %}
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <h3>Today's Appointments</h3>
+                            <a href="{{ url_for('appointment.appointments_page') }}" class="btn-sm">View All</a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Patient ID</th>
+                                        {% if session['role'] != 'Doctor' %}<th>Doctor</th>{% endif %}
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for appt in tables.recent_appointments %}
+                                    <tr>
+                                        <td class="fw-500">{{ appt.patient_id }}</td>
+                                        {% if session['role'] != 'Doctor' %}<td>{{ appt.doctor_username }}</td>{% endif %}
+                                        <td>{{ appt.appointment_time }}</td>
+                                        <td><span class="status-pill status-{{ appt.status.lower() }}">{{ appt.status }}</span></td>
+                                    </tr>
+                                    {% else %}
+                                    <tr><td colspan="4" class="text-center text-muted">No appointments scheduled for today.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if 'recent_patients' in tables %}
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <h3>Recent Registrations</h3>
+                            <a href="{{ url_for('patient.patient_list') }}" class="btn-sm">View All</a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Patient ID</th>
+                                        <th>Name</th>
+                                        <th>Registered Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for p in tables.recent_patients %}
+                                    <tr>
+                                        <td class="fw-500">{{ p.patient_id }}</td>
+                                        <td>{{ p.name }}</td>
+                                        <td>{{ p.created_at[:10] }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr><td colspan="3" class="text-center text-muted">No recent patients.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if 'low_stock_items' in tables %}
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <h3>Low Stock Critical</h3>
+                            <a href="{{ url_for('pharmacy.pharmacy_page') }}" class="btn-sm">View Inventory</a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Medicine</th>
+                                        <th>Stock</th>
+                                        <th>Threshold</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for m in tables.low_stock_items %}
+                                    <tr>
+                                        <td class="fw-500 text-danger">{{ m.medicine_name }}</td>
+                                        <td><span class="status-pill status-cancelled">{{ m.stock_qty }}</span></td>
+                                        <td>{{ m.low_stock_threshold }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr><td colspan="3" class="text-center text-muted">Inventory is healthy.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- AJAX Polling Script -->
+    <script>
+        function updateStats() {
+            fetch('/api/dashboard/stats')
+                .then(response => response.json())
+                .then(data => {
+                    if(data.error) return;
+                    
+                    const elPatients = document.getElementById('val-total-patients');
+                    if (elPatients) elPatients.textContent = data.total_patients;
+                    
+                    const elDoctors = document.getElementById('val-total-doctors');
+                    if (elDoctors) elDoctors.textContent = data.total_doctors;
+                    
+                    const elTodayAppt = document.getElementById('val-today-appts');
+                    if (elTodayAppt) elTodayAppt.textContent = data.today_appointments_all;
+                    
+                    const elTodayApptDoc = document.getElementById('val-today-appts-doc');
+                    if (elTodayApptDoc) elTodayApptDoc.textContent = data.today_appointments_doctor;
+                    
+                    const elBeds = document.getElementById('val-beds');
+                    if (elBeds) elBeds.textContent = data.available_beds;
+                    
+                    const elLowStock = document.getElementById('val-low-stock');
+                    if (elLowStock) elLowStock.textContent = data.low_stock_medicines;
+
+                    const elPendingRx = document.getElementById('val-pending-rx');
+                    if (elPendingRx) elPendingRx.textContent = data.pending_prescriptions;
+                })
+                .catch(err => console.error("Error fetching stats:", err));
+        }
+
+        // Poll every 30 seconds
+        setInterval(updateStats, 30000);
+    </script>
+</body>
+</html>

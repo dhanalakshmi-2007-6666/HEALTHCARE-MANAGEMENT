@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Doctor Daily Appointments{% endblock %}
+{% block content %}
+<h2>Doctor Daily Appointments</h2>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead><tr><th>Appointment ID</th><th>Patient ID</th><th>Status</th><th>Notes</th></tr></thead>
+            <tbody>
+                {% for item in appointments %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.patient_id }}</td>
+                    <td>{{ item.status }}</td>
+                    <td>{{ item.notes or "-" }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="text-center text-muted py-3">No appointments for today.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

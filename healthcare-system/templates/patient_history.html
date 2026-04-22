@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Patient History{% endblock %}
+{% block content %}
+<h2>{{ patient.full_name }} ({{ patient.patient_code }})</h2>
+<p class="text-muted">{{ patient.gender }} | {{ patient.phone }} | {{ patient.address }}</p>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card h-100"><div class="card-body">
+            <h5>Medical Records</h5>
+            {% for r in patient.medical_records %}
+            <div class="mb-2 p-2 border rounded">
+                <strong>{{ r.created_at.strftime("%Y-%m-%d %H:%M") }}</strong>
+                <div>{{ r.diagnosis }}</div>
+                <small class="text-muted">{{ r.treatment_notes }}</small>
+            </div>
+            {% else %}<p class="text-muted">No records.</p>{% endfor %}
+            {% if session.get("role") == "Doctor" %}
+            <form method="POST" action="{{ url_for('patient.add_record', patient_id=patient.id) }}">
+                <input class="form-control mb-2" name="diagnosis" placeholder="Diagnosis" required>
+                <textarea class="form-control mb-2" name="treatment_notes" placeholder="Notes"></textarea>
+                <button class="btn btn-primary btn-sm">Add Record</button>
+            </form>
+            {% endif %}
+        </div></div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card h-100"><div class="card-body">
+            <h5>Vitals and Lab Reports</h5>
+            {% for v in patient.vital_signs %}
+            <div class="mb-2 p-2 border rounded">
+                <strong>{{ v.recorded_at.strftime("%Y-%m-%d %H:%M") }}</strong> -
+                BP {{ v.blood_pressure }}, Temp {{ v.temperature }}, Pulse {{ v.pulse_rate }}, SpO2 {{ v.spo2 }}
+            </div>
+            {% else %}<p class="text-muted">No vitals.</p>{% endfor %}
+            {% if session.get("role") == "Nurse" %}
+            <form method="POST" action="{{ url_for('patient.add_vitals', patient_id=patient.id) }}" class="row g-2">
+                <div class="col-6"><input class="form-control" name="blood_pressure" placeholder="120/80"></div>
+                <div class="col-6"><input class="form-control" name="pulse_rate" type="number" placeholder="Pulse"></div>
+                <div class="col-6"><input class="form-control" name="temperature" type="number" step="0.1" placeholder="Temp"></div>
+                <div class="col-6"><input class="form-control" name="spo2" type="number" placeholder="SpO2"></div>
+                <div class="col-12"><input class="form-control" name="notes" placeholder="Notes"></div>
+                <div class="col-12"><button class="btn btn-secondary btn-sm">Add Vitals</button></div>
+            </form>
+            {% endif %}
+            <hr>
+            <ul>
+                {% for file in patient.lab_reports %}
+                <li><a href="{{ url_for('static', filename=file.file_path.replace('static/', '')) }}" target="_blank">{{ file.file_name }}</a></li>
+                {% else %}<li class="text-muted">No lab reports.</li>{% endfor %}
+            </ul>
+            {% if session.get("role") in ["Doctor", "Nurse", "Admin"] %}
+            <form method="POST" action="{{ url_for('patient.upload_report', patient_id=patient.id) }}" enctype="multipart/form-data">
+                <input type="file" class="form-control mb-2" name="lab_report" required>
+                <button class="btn btn-dark btn-sm">Upload</button>
+            </form>
+            {% endif %}
+        </div></div>
+    </div>
+</div>
+{% endblock %}

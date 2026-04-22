@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Verify OTP{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card"><div class="card-body">
+            <h4>Verify OTP</h4>
+            <p class="text-muted">Resetting password for {{ email }}</p>
+            <form method="POST">
+                <input class="form-control mb-2" name="otp" placeholder="Enter OTP" required>
+                <input type="password" class="form-control mb-3" name="new_password" placeholder="New password" required>
+                <button class="btn btn-success w-100">Change Password</button>
+            </form>
+        </div></div>
+    </div>
+</div>
+{% endblock %}

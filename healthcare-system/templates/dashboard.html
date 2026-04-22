@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ role }} Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ role }} Dashboard</h2>
+</div>
+<div class="row g-3 mb-4">
+    {% for card in cards %}
+    <div class="col-md-4">
+        <div class="card h-100 dashboard-card">
+            <div class="card-body">
+                <h5 class="card-title">{{ card }}</h5>
+                <p class="text-muted mb-0">Quick action module for {{ card|lower }}.</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="mb-3">Module Shortcuts</h5>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-primary" href="{{ url_for('patient.list_patients') }}">Patients</a>
+            <a class="btn btn-outline-primary" href="{{ url_for('appointment.appointment_page') }}">Appointments</a>
+            <a class="btn btn-outline-primary" href="{{ url_for('pharmacy.pharmacy_dashboard') }}">Pharmacy</a>
+            <a class="btn btn-outline-primary" href="{{ url_for('admin.admissions') }}">Admissions</a>
+            {% if role == "Admin" %}
+            <a class="btn btn-outline-dark" href="{{ url_for('admin.manage_users') }}">Admin Users</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

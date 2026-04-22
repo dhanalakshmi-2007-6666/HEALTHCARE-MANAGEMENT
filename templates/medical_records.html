@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Records</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <main class="dashboard-shell">
+        <section class="dashboard-card doctor-theme">
+            <div class="dashboard-topbar">
+                <div>
+                    <span class="brand-badge">Medical Records</span>
+                    <h1>Patient Medical History</h1>
+                    <p>Add diagnosis, prescription notes, and upload lab reports (PDF).</p>
+                </div>
+                <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
+            </div>
+
+            {% if message %}
+            <div class="alert {{ message_type }}">{{ message }}</div>
+            {% endif %}
+
+            {% if session['role'] in ['Doctor', 'Admin'] %}
+            <div class="info-card" style="margin-bottom: 20px;">
+                <h3>Add Medical Record</h3>
+                <form method="post" enctype="multipart/form-data" class="login-form">
+                    <label for="patient_id">Patient ID</label>
+                    <input id="patient_id" name="patient_id" placeholder="PAT2026001" required>
+
+                    <label for="diagnosis">Diagnosis</label>
+                    <input id="diagnosis" name="diagnosis" placeholder="Diagnosis details" required>
+
+                    <label for="prescription_notes">Prescription Notes</label>
+                    <input id="prescription_notes" name="prescription_notes" placeholder="Prescription notes" required>
+
+                    <label for="lab_report">Lab Report (PDF)</label>
+                    <input id="lab_report" type="file" name="lab_report" accept=".pdf">
+
+                    <button type="submit">Save Medical Record</button>
+                </form>
+            </div>
+            {% endif %}
+
+            <form method="get" class="login-form" style="margin-bottom: 16px;">
+                <label for="q">Search medical history</label>
+                <input id="q" name="q" value="{{ query }}" placeholder="Search by patient ID or diagnosis">
+                <button type="submit">Search</button>
+            </form>
+
+            <div class="info-card">
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">ID</th>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">Patient
+                                </th>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">Doctor
+                                </th>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">Diagnosis
+                                </th>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">
+                                    Prescription</th>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">Lab Report
+                                </th>
+                                <th style="text-align:left; padding: 10px; border-bottom: 1px solid #dbe4f0;">Created
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in records %}
+                            <tr>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{ record.id }}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{ record.patient_id }}
+                                </td>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{ record.doctor_username
+                                    }}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{ record.diagnosis }}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{
+                                    record.prescription_notes }}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">
+                                    {% if record.lab_report_path %}
+                                    <a href="{{ url_for('static', filename=record.lab_report_path) }}"
+                                        target="_blank">View PDF</a>
+                                    {% else %}
+                                    <span class="text-muted">No file</span>
+                                    {% endif %}
+                                </td>
+                                <td style="padding: 10px; border-bottom: 1px solid #edf2f7;">{{ record.created_at }}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="7" style="padding: 14px; color: #64748b;">No medical records found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="support-text" style="text-align:left; margin-top: 16px;">
+                <a
+                    href="{{ url_for('dashboard.doctor_dashboard') if session['role'] == 'Doctor' else (url_for('dashboard.admin_dashboard') if session['role'] == 'Admin' else url_for('dashboard.nurse_dashboard')) }}">Back
+                    to dashboard</a>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>

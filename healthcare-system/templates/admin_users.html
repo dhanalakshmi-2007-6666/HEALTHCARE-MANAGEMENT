@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Admin Users{% endblock %}
+{% block content %}
+<h2>Admin: User and Role Management</h2>
+
+<div class="card mb-3"><div class="card-body">
+    <h5>Create Custom Role</h5>
+    <form method="POST" action="{{ url_for('admin.create_role') }}" class="row g-2">
+        <div class="col-md-3"><input class="form-control" name="name" placeholder="Role name" required></div>
+        <div class="col-md-4"><input class="form-control" name="description" placeholder="Description"></div>
+        <div class="col-md-3"><input class="form-control" name="permissions" placeholder="perm1,perm2"></div>
+        <div class="col-md-2"><button class="btn btn-dark w-100">Create</button></div>
+    </form>
+</div></div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Active</th><th>Update</th></tr></thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <form method="POST">
+                        <td>{{ u.email }}<input type="hidden" name="user_id" value="{{ u.id }}"></td>
+                        <td>{{ u.full_name }}</td>
+                        <td>
+                            <select class="form-select form-select-sm" name="role_id">
+                                {% for r in roles %}
+                                <option value="{{ r.id }}" {% if r.id == u.role_id %}selected{% endif %}>{{ r.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-select form-select-sm" name="is_active">
+                                <option value="true" {% if u.is_active %}selected{% endif %}>Active</option>
+                                <option value="false" {% if not u.is_active %}selected{% endif %}>Inactive</option>
+                            </select>
+                        </td>
+                        <td><button class="btn btn-sm btn-primary">Save</button></td>
+                    </form>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

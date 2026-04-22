@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Appointments{% endblock %}
+{% block content %}
+<h2 class="mb-3">Appointment and Scheduling</h2>
+
+<div class="row g-3 mb-4">
+    <div class="col-lg-6">
+        <div class="card"><div class="card-body">
+            <h5>Create Availability</h5>
+            <form method="POST" action="{{ url_for('appointment.create_availability') }}" class="row g-2">
+                <div class="col-md-12">
+                    <select class="form-select" name="doctor_id">
+                        {% for doctor in doctors %}<option value="{{ doctor.id }}">{{ doctor.full_name }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6"><input type="datetime-local" name="start_time" class="form-control" required></div>
+                <div class="col-md-6"><input type="datetime-local" name="end_time" class="form-control" required></div>
+                <div class="col-md-12"><button class="btn btn-primary w-100">Add Slot</button></div>
+            </form>
+        </div></div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card"><div class="card-body">
+            <h5>Book Appointment</h5>
+            <form method="POST" action="{{ url_for('appointment.book_appointment') }}" class="row g-2">
+                <div class="col-md-12"><input class="form-control" type="number" name="patient_id" placeholder="Patient DB ID" required></div>
+                <div class="col-md-12">
+                    <select class="form-select" name="availability_id">
+                        {% for slot in availabilities %}
+                        <option value="{{ slot.id }}">Doctor {{ slot.doctor_id }} | {{ slot.start_time.strftime("%Y-%m-%d %H:%M") }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-12"><button class="btn btn-success w-100">Book Slot</button></div>
+            </form>
+        </div></div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead><tr><th>ID</th><th>Patient</th><th>Doctor</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+            {% for appt in appointments %}
+            <tr>
+                <td>{{ appt.id }}</td>
+                <td>{{ appt.patient_id }}</td>
+                <td>{{ appt.doctor_id }}</td>
+                <td>{{ appt.status }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('appointment.update_status', appointment_id=appt.id) }}" class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-warning" name="action" value="RESCHEDULED">Reschedule</button>
+                        <button class="btn btn-sm btn-outline-danger" name="action" value="CANCELLED">Cancel</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" class="text-center py-3 text-muted">No appointments.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
